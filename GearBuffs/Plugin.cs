@@ -61,14 +61,16 @@ namespace GearBuffs
                         {
                             aurabuff(player, _gb);
                             antiaura(player, _gb);
-                            giveBuff(player, _gb);
+                            if (_gb.aura != "antiaura")
+                                giveBuff(player, _gb);
                         }
                     }
                     else if (HasItem(player, _item))
                     {
                         aurabuff(player, _gb);
                         antiaura(player, _gb);
-                        giveBuff(player, _gb);
+                        if (_gb.aura != "antiaura")
+                            giveBuff(player, _gb);
                     }
                     _item = null;
                 }
@@ -77,10 +79,13 @@ namespace GearBuffs
 
         private void giveBuff(TSPlayer player, GearBuff _gb)
         {
-            if(_gb.aura != "antiaura")
-            {
-                player.SetBuff(_gb.buff, _gb.duration * 60);
-            }
+            if (_gb.buff == 94) //adjusts to keep the Mana Sickness debuff a static value instead of it compounding on itself until it hits 10 seconds
+                if (player.TPlayer.HasBuff(94) >= 0)
+                {
+                    player.SetBuff(_gb.buff, 60);
+                    return;
+                }
+            player.SetBuff(_gb.buff, _gb.duration * 60);
         }
 
         private void aurabuff(TSPlayer player, GearBuff _gb)
@@ -93,7 +98,7 @@ namespace GearBuffs
                     {
                         if (_gb.range * 15 >= distanceCheck(ply, player))
                         {
-                            ply.SetBuff(_gb.buff, _gb.duration * 60);
+                            giveBuff(ply, _gb);
                         }
                     }
                 }
@@ -110,7 +115,7 @@ namespace GearBuffs
                     {
                         if (_gb.range * 15 >= distanceCheck(ply, player))
                         {
-                            ply.SetBuff(_gb.buff, _gb.duration * 60);
+                            giveBuff(ply, _gb);
                         }
                     }
                 }
