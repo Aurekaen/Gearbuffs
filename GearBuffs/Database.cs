@@ -93,14 +93,6 @@ namespace GearBuffs
             Query("DELETE FROM GearBuffs WHERE ITEM = @0", itemID);
         }
 
-        public void UpdateGearBuff(GearBuff update)
-        {
-            var query =
-                string.Format(
-                    "UPDATE JumpPads SET Item = {0}, Buff = {1}, Duration = {2}, Held = {3}, Aura = {4}, Range = {5}",
-                    update.item, update.buff, update.duration, update.held, update.aura, update.range);
-        }
-
         public void LoadGearBuffs(ref List<GearBuff> list)
         {
             using (var reader = QueryReader("SELECT * FROM GearBuffs"))
