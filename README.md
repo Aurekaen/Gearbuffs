@@ -1,4 +1,6 @@
 # Gearbuffs
+
+NOTE: AURAS/ANTIAURAS CURRENTLY DISABLED DUE TO BUGS.
 Applies buffs to players if they have a specified item.
 Also allows for Auras and Antiauras. 
 Auras apply GearBuffs to all teammates (and the player who has the item)within a designated radius, while AntiAuras apply to all players on a different team(and DO NOT apply to the person holding the item).
