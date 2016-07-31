@@ -19,6 +19,7 @@ namespace GearBuffs
         private static Database db;
         private static Timer updateTimer;
         private static List<GearBuff> _gearBuffs = new List<GearBuff>();
+        public static List<TSPlayer> _players = new List<TSPlayer>();
         public Plugin(Main game) : base(game)
         {
         }
@@ -30,6 +31,8 @@ namespace GearBuffs
 
             Commands.ChatCommands.Add(new Command("gearbuffs.add", AddGearBuff, "gearbuff", "gb"));
             ServerApi.Hooks.GamePostInitialize.Register(this, OnPostInitialize);
+            ServerApi.Hooks.NetGreetPlayer.Register(this, OnGreet);
+            ServerApi.Hooks.ServerLeave.Register(this, OnLeave);
         }
 
         protected override void Dispose(bool disposing)
@@ -37,8 +40,20 @@ namespace GearBuffs
             if (disposing)
             {
                 ServerApi.Hooks.GamePostInitialize.Deregister(this, OnPostInitialize);
+                ServerApi.Hooks.NetGreetPlayer.Deregister(this, OnGreet);
+                ServerApi.Hooks.ServerLeave.Deregister(this, OnLeave);
             }
             base.Dispose(disposing);
+        }
+
+        private void OnGreet(GreetPlayerEventArgs args)
+        {
+            _players.Add(TShock.Players[args.Who]);
+        }
+
+        private void OnLeave(LeaveEventArgs args)
+        {
+            _players.Remove(TShock.Players[args.Who]);
         }
 
         private void OnPostInitialize(EventArgs args)
@@ -46,11 +61,12 @@ namespace GearBuffs
             updateTimer = new Timer(1000);
             updateTimer.Elapsed += UpdateTimerOnElapsed;
             updateTimer.Start();
+            _players.AddRange(TShock.Players.Where(player => player != null));
         }
 
         private void UpdateTimerOnElapsed(object sender, ElapsedEventArgs args)
         {
-            foreach (var player in TShock.Players)
+            foreach (var player in _players)
             {
                 foreach (GearBuff _gb in _gearBuffs)
                 {
@@ -59,16 +75,16 @@ namespace GearBuffs
                     {
                         if (holdingItem(player, _item))
                         {
-                            aurabuff(player, _gb);
-                            antiaura(player, _gb);
+                            //aurabuff(player, _gb);
+                            //antiaura(player, _gb);
                             if (_gb.aura != "antiaura")
                                 giveBuff(player, _gb);
                         }
                     }
                     else if (HasItem(player, _item))
                     {
-                        aurabuff(player, _gb);
-                        antiaura(player, _gb);
+                        //aurabuff(player, _gb);
+                        //antiaura(player, _gb);
                         if (_gb.aura != "antiaura")
                             giveBuff(player, _gb);
                     }
@@ -450,6 +466,8 @@ namespace GearBuffs
                 args.Player.SendErrorMessage("Gearbuffs Refreshed!");
                 _gearBuffs.Clear();
                 db.LoadGearBuffs(ref _gearBuffs);
+                _players.Clear();
+                _players.AddRange(TShock.Players.Where(player => player != null));
                 return;
             }
             if (GBuffAction == "disable")
